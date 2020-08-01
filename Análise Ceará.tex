@@ -1,0 +1,212 @@
+\documentclass[a4paper,12pt,oneside,titlepage]{article}
+\usepackage[brazilian,english]{babel}
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx,color}
+\usepackage{makeidx}
+\usepackage{float}
+\usepackage{listings}
+\makeindex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{indentfirst}
+\usepackage{url}
+% pacotes para incrementar recursos matematicos
+% amsmath -> recursos avancados de matematica
+% amssymb -> symbolos e fontes adicionais (ele inclui amsfonts)
+% amsthm -> teorema de demonstracao
+\usepackage{amsmath,amssymb} 
+\usepackage{amsthm} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% para configurar a lista enumerada
+\usepackage{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% tabela longa que quebra entre p\'aginas
+\usepackage{longtable}
+
+% linhas duplas na tabela
+\usepackage{hhline}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Para incluir imagens externas no LaTeX
+% caixa gr\'afica
+\usepackage{graphicx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Pacotes graficos para figuras
+% usando comandos de LaTeX
+
+% Ative o pict2e, se for usar ambiente picture
+%  \usepackage{pict2e}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Caso queira indentar a primeira linha do capitulo/secao, ative-o
+% \usepackage{indentfirst}
+
+%%%%%%%%%%%%%%%%%%%%
+% indice remissivo
+%\usepackage{makeidx}
+%\makeindex % ativar (necess\'ario)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% para acertar margens
+% No caso de PCTeX 4.0 ou anterior, os arquivos 
+% geometry.sty e geometry.cfg devem ficar junto com 
+% o arquivo tex em edicao por n\~ao fazer parte da instala\c{c}\~ao.
+
+\usepackage{geometry}
+% Acerto de margens:
+% lmargin -> left (esquerda). Interna, se frente/verso
+% rmargin -> right (direita). Externa, se frente/verso
+% tmargin -> top (superior).
+% bmargin -> bot (inferior).
+\geometry{lmargin=3.0cm,rmargin=2.0cm,tmargin=2.5cm,bmargin=2.0cm}
+
+\usepackage{cite}
+
+\begin{document}
+
+\begin{center}
+	
+
+\textbf{Análise da Flexibilização do Isolamento Social do Ceará: Média Móvel e  Modelo SIR}
+
+
+\end{center}
+\begin{flushright}
+	\textbf{Vinícius Barbosa Godinho\footnote{E-mail: viniciusbgodinho@gmail.com ,   twitter:@vbgodinho.}} \\
+	\textbf{14/07/2020}
+\end{flushright}
+
+
+\section{Introdução}	
+
+
+O estado cearense é um dos mais afetados pelo coronavírus, sendo o terceiro com maior número de óbitos, ficando atrás apenas de São Paulo e Rio de Janeiro, primeiro e segundo, respectivamente. Porém o Ceará tem apresentando uma queda da média de novos óbitos desde o mês de junho e adotando uma flexibilização do isolamento. Assim, é importante entender os motivos dessa queda e analisar o plano de flexibilização do governo que é dividido em uma fase de transição e outras quatro fases de abertura.
+
+O intuito desse estudo é demonstrar a trajetória dos novos óbitos dos municípios mais afetados e estimar os números de infectados para 10 dias utilizando um modelo SIR\footnote{Dados da Secretaria Estadual de Saúde}. Dos municípios analisados Fortaleza se encontra na fase 3, a região metropolitana na fase 2, a região do Cariri\footnote{Foi utilizado apenas Crato e Juazeiro do Norte} na fase transição e Sobral no isolamento rígido. 
+
+  
+
+\section{Análise Média Móvel: 7 dias}
+
+Para analisar a média móvel foi utilizada uma média centrada para 7 dias. Para entender a trajetória de queda dos novos óbitos no estado é necessário destacar Fortaleza dos demais municípios, pois é justamente a maior queda na capital que puxou a queda no estado como podemos observar na figura \ref{g1}. 
+	
+	\begin{figure}[H]
+		\centering
+		\caption{Fortaleza}
+		\input{tikz_fortal}
+		\label{g1}
+		\ \footnotesize Dados: SES. Disponibilizados: https://data.brasil.io/. Elaborado: Vinícius Godinho. 
+		
+	\end{figure}
+	
+
+O período destacado entre a linha tracejada foi o de isolamento social rígido. Pode-se perceber o efeito positivo gerado por esse isolamento, pois foi após o período de 3 semanas do decreto que iniciou a queda da média diária dos novos óbitos.
+
+A figura \ref{g2} ilustra os municípios mais afetados, exceto Fortaleza. É possível observar que os municípios da região metropolitana mais afetados, Caucaia e Maracanaú, também apresentaram uma queda da média, porém a partir da primeira semana de junho. Já a região do Cariri registrou um aumento médio do número de casos, mostrando uma interiorização do vírus muito preocupante, visto a falta de infraestrutura do interior frente à capital, movimento que vem ocorrendo nos demais estados.	
+	
+	\begin{figure}[H]
+		\centering
+		\caption{Municípios Ceará}
+		\input{tikz_cidades_ce}
+		\label{g2}
+		\ \footnotesize Dados: SES. Disponibilizados: https://data.brasil.io/. Elaborado: Vinícius Godinho. 
+		
+	\end{figure}
+	
+
+\section{Estimando o número de infectados para 10 dias - modelo SIR}
+
+Para projetar o número de infectados foi utilizado o modelo epidemiológico SIR (Suscetíveis - Infectados. - Removidos) desenvolvido por Kermack e Mckendrick, apresentado na equação:
+
+\begin{center}
+	
+
+$d_S/d_t=-(\beta*I*S)/N$ \\
+$d_I/d_t=(\beta*I*S)N  - \gamma *I$ \\
+$d_R/d_t=\gamma*I$ \\
+
+Desse modo a taxa de transmissão do modelo é R0 \\
+
+$R0=(\beta/\gamma)/N$
+
+
+\end{center}
+
+
+Para: S= suscetíveis, I= infectados, R = recuperados, N = população, R0= taxa de transmissão, $\gamma$= taxa de recuperação e $\beta$ = taxa de infecção.
+
+
+Ou seja: para $R0 < 1$ o número de infectados decresce. Foi utilizado um período de infecção igual a 5,2 dias, desse modo a taxa de recuperação $(\gamma=1/5,2)$, como utilizado no modelo adotado pela UFPEL\footnote{ \url{https://wp.ufpel.edu.br/fentransporte/2020/04/09/a-evolucao-epidemica-do-covid-19-modelo-sir/}}. 
+
+
+Desse modo, utilizando a taxa de transmissão disponibilizada pelo governo do Ceará\footnote{\url{https://indicadores.integrasus.saude.ce.gov.br/indicadores/indicadores-coronavirus/repro-efetiva-rt}}, podemos calcular a taxa de infecção $(\beta)$ e projetar o número de infectados para os próximos 10 dias, considerando as taxas a seguir constante: 
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{rr}
+		\hline
+		 Região & R0 \\ 
+		\hline
+		Cariri & 0,95 \\
+		Fortaleza & 0,81 \\
+		Sobral & 0,98 \\
+		\hline
+	\end{tabular}
+\end{table}	
+
+\textbf{Previsão:}
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{cccccccccc}
+		&  &  Fortaleza&  &  & Cariri&  &  & Sobral &\\
+		\hline
+		Dias&S&I& R & S & I& R & S & I & R\\
+		\hline
+		 0 & 2606858 & 9528 & 28614 & 342772 & 1604 & 4741 & 138912 & 1029 & 7412 \\  
+		 1 & 2605423 & 9165 & 30411 & 342486 & 1583 & 5047 & 138730 & 1013 & 7608 \\ 
+		 2 & 2604044 & 8815 & 32139 & 342204 & 1562 & 5349 & 138552 & 998 & 7801 \\  
+		 3 & 2602719 & 8478 & 33802 & 341926 & 1541 & 5648 & 138376 & 983 & 7992 \\  
+		 4 & 2601445 & 8153 & 35401 & 341652 & 1521 & 5943 & 138203 & 968 & 8180 \\  
+		 5 & 2600220 & 7840 & 36939 & 341382 & 1500 & 6233 & 138034 & 953 & 8365 \\  
+		 6 & 2599043 & 7539 & 38417 & 341116 & 1480 & 6520 & 137867 & 938 & 8547 \\   
+		 7 & 2597911 & 7248 & 39839 & 340854 & 1459 & 6802 & 137703 & 923 & 8726 \\  
+		 8 & 2596824 & 6968 & 41206 & 340595 & 1439 & 7081 & 137541 & 908 & 8902 \\   
+		 9 & 2595779 & 6699 & 42520 & 340340 & 1419 & 7356 & 137383 & 893 & 9075 \\   
+		 10 & 2594775 & 6440 & 43783 & 340090 & 1399 & 7627 & 137227 & 879 & 9246 \\   
+		\hline
+	\end{tabular}
+\end{table}
+	
+
+		
+	
+Podemos observar na figura \ref{g3} que se  a taxa de transmissão permanecer constante Fortaleza decrescerá o número de infectados, com uma inclinação da curva bem maior do que as outras regiões. Essas vão apresentando uma pequena queda, que só será continuada mantendo a $R0 < 1$. Assim deve-se ter bastante atenção com as etapas de flexibilização do Cariri e Sobral, pois essas regiões  apresentaram $R0 < 1$ apenas nesses últimos dias podendo voltar a ficar maior do que um.   	
+	
+	\begin{figure}[H]
+		\centering
+		\caption{Projeção Número de Infectados}
+		\input{tikz_sir}
+		\label{g3}
+		\ \footnotesize Dados: SES-CE. Elaborado: Vinícius Godinho. 
+		
+	\end{figure}
+	
+	
+\section{Conclusão}
+	
+A média dos novos óbitos do estado do Ceará caiu de forma considerável, puxada pela queda na capital. Dessa forma, podemos perceber  que o isolamento rígido em Fortaleza foi o ponto fundamental para a queda da média de novos óbitos.
+
+Com essa taxa de transmissão constante o número de infectados em Fortaleza tende a continuar caindo, porém exige atenção e constante monitoramento visto que o resultado da flexibilização e reabertura pode refletir daqui algumas semanas uma segunda onda.
+
+A interiorização do contágio é o ponto mais preocupante para o estado. A região do Cariri apesar de ter diminuído ao longo dos dias sua taxa de transmissão e alcançado $R0 < 1$, essa ainda é muito próxima de 1. Mesmo com a média móvel dos óbitos aumentando a região já se encontra na fase de transição do plano de flexibilização do estado. Desse modo, essa região deveria voltar para o isolamento rígido, assim como permanece Sobral. 
+	
+	
+\end{document}	
