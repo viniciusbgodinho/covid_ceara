@@ -1,0 +1,200 @@
+---
+title: "Covid-19: Brasil"
+author: "Vinícius Barbosa Godinho"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    social: menu
+    
+---
+
+```{r setup, include=FALSE}
+
+
+con <- gzcon(url(paste("https://data.brasil.io/dataset/covid19/caso_full.csv.gz", sep=",")))
+txt <- readLines(con)
+dados <- read.csv(textConnection(txt))
+
+
+
+library("dplyr")
+library("tidyr")
+library("lubridate")
+library("ggplot2")
+require('tikzDevice')
+library("devtools")
+library(plotly)
+library("flexdashboard")
+library("sf")  
+library("tmap")
+library("tmaptools")
+library("rgdal")
+library("leaflet")
+
+
+colnames(dados)[8] <-'confirmed'
+colnames(dados)[12] <-'deaths'
+colnames(dados)[9] <- 'confirmed_per_100k'
+
+
+
+
+###Brasil
+
+
+dados_ce <- dados %>%
+  filter(place_type=="city", state =="CE") %>%
+  arrange(date) %>%
+  mutate(round(deaths/confirmed*100,digits = 2)) 
+
+
+
+str(dados_ce)
+
+
+dados_ce$date <- as.Date(dados_ce$date)
+
+
+map_br_ce <- read_sf("E:/Covid-19/municipios/ce_municipios/23MUE250GC_SIR.shp")
+
+
+
+
+
+df_map_ce <- dados_ce %>%
+  group_by(city_ibge_code) 
+
+df_map_ce <- df_map_ce %>%
+  summarize(last(confirmed),last(new_confirmed),
+            last(deaths),last(new_deaths),
+            round(sum(new_deaths)/sum(new_confirmed)*100,digits = 2))
+
+
+
+
+
+df_map_ce <- as.data.frame(df_map_ce)
+
+
+
+names(df_map_ce) 
+names(map_br_ce) 
+
+
+colnames(df_map_ce)[1]<-"CD_GEOCMU"
+
+
+
+
+df_map_ce$CD_GEOCMU <- as.character(df_map_ce$CD_GEOCMU)
+
+#Une a base de dados da planilha com o mapa pelo nome do município
+
+
+#br_est=merge (br_est,df_map_estados,by="NM_ESTADO", all.x=T) 
+
+
+br_ce <- inner_join(map_br_ce,df_map_ce,by="CD_GEOCMU")
+
+
+
+names(br_ce)
+
+colnames(br_ce)[1] <- "Municipio"
+colnames(br_ce)[4] <- "Confirmados"
+colnames(br_ce)[5] <- "Novos Confirmados"
+colnames(br_ce)[6] <- "Obitos"
+colnames(br_ce)[7] <- "Novos Obitos"
+colnames(br_ce)[8] <- "Taxa Letalidade"
+
+br_ce <- br_ce[-2]
+
+
+mapa_ce_geral <- br_ce
+mapa_ce_confirmados <- br_ce
+mapa_ce_obitos <- br_ce
+
+
+
+
+df_ce <-group_by(dados_ce,date) %>%
+  summarise(confirmed=sum(confirmed),new_confirmed=sum(new_confirmed),deaths=sum(deaths),new_deaths=sum(new_deaths))
+
+```
+
+Ceará - Municípios
+=======================================================================
+
+
+Row
+-------------------------------------
+
+### Última Atualização
+
+```{r}
+valueBox(format(today(), "%d/%m/%Y"),
+         color = "gray")
+```
+
+
+### Total de Casos
+
+```{r}
+valueBox(last(df_ce$confirmed))
+```
+
+### Novos Casos
+
+```{r}
+valueBox(last(df_ce$new_confirmed))
+```
+
+### Total de Óbitos
+
+```{r}
+valueBox(last(df_ce$deaths),
+         color = "red")
+
+```
+
+### Novos Óbitos
+
+```{r}
+valueBox(last(df_ce$new_deaths),
+         color = "red")
+```
+
+### Taxa de Letalidade (%)
+
+```{r}
+valueBox(gsub('\\.',',',round((max(df_ce$deaths)/max(df_ce$confirmed))*100,
+         digits = 2)),
+         color = "gray")
+```
+
+
+Row
+-------------------------------------
+
+### Escolha o tipo do mapa e clique nos estados para ver as informações. Dados:Secretarias Estaduais de Saúde. Disponibilizado: https://data.brasil.io/.
+
+```{r}
+
+
+tmap_mode("view")
+
+
+
+tm_shape(mapa_ce_geral) +
+  tm_sf()+
+tm_shape(mapa_ce_confirmados) +
+  tm_sf("Confirmados", palette = "Blues")+
+tm_shape(mapa_ce_obitos) +
+  tm_sf("Obitos", palette= "Reds")
+
+
+
+
+```
+
